@@ -293,19 +293,14 @@ namespace Microsoft.ReportingServices.Rendering.ExcelRenderer.Layout
 
 		private static ImageFormat GetImageFormat(SKCodec codec)
 		{
-			switch (codec.EncodedFormat)
+			return codec.EncodedFormat switch
 			{
-				case SKEncodedImageFormat.Gif:
-					return ImageFormat.Gif;
-				case SKEncodedImageFormat.Jpeg:
-					return ImageFormat.Jpeg;
-				case SKEncodedImageFormat.Png:
-					return ImageFormat.Png;
-				case SKEncodedImageFormat.Bmp:
-					return ImageFormat.Bmp;
-				default:
-					throw new ReportRenderingException(ExcelRenderRes.UnknownImageFormat(codec.EncodedFormat.ToString()));
-			}
+				SKEncodedImageFormat.Gif => ImageFormat.Gif,
+				SKEncodedImageFormat.Jpeg => ImageFormat.Jpeg,
+				SKEncodedImageFormat.Png => ImageFormat.Png,
+				SKEncodedImageFormat.Bmp => ImageFormat.Bmp,
+				_ => throw new ReportRenderingException(ExcelRenderRes.UnknownImageFormat(codec.EncodedFormat.ToString()))
+			};
 		}
 	}
 }
