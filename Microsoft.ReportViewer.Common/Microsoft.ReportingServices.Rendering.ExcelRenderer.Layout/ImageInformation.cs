@@ -275,6 +275,7 @@ namespace Microsoft.ReportingServices.Rendering.ExcelRenderer.Layout
 
 		private void CalculateMetrics()
 		{
+			const float DEFAULT_DPI = 96f;
 			if (m_imageData != null && m_imageData.Length != 0L)
 			{
 				m_imageData.Position = 0L;
@@ -283,8 +284,8 @@ namespace Microsoft.ReportingServices.Rendering.ExcelRenderer.Layout
 				m_imageFormat = GetImageFormat(codec);
 				Width = image.Width;
 				Height = image.Height;
-				HorizontalResolution = image.Width;
-				VerticalResolution = image.Height;
+				HorizontalResolution = DEFAULT_DPI;
+				VerticalResolution = DEFAULT_DPI;
 				codec.Dispose();
 				image.Dispose();
 			}

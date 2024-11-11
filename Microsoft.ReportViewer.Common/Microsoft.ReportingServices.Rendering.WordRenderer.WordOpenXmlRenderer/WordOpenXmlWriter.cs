@@ -332,6 +332,7 @@ namespace Microsoft.ReportingServices.Rendering.WordRenderer.WordOpenXmlRenderer
 
 		public void AddImage(byte[] imgBuf, float height, float width, RPLFormat.Sizings sizing)
 		{
+			const float DEFAULT_DPI = 96f;
 			bool flag = imgBuf == null || imgBuf.Length == 0;
 			Size image = default(Size);
 			string extension = null;
@@ -342,8 +343,8 @@ namespace Microsoft.ReportingServices.Rendering.WordRenderer.WordOpenXmlRenderer
 					using (var image2 = SKImage.FromEncodedData(new MemoryStream(imgBuf)))
 					using (var codec = SKCodec.Create(image2.EncodedData))
 					{
-						image.Height = WordOpenXmlUtils.PixelsToEmus(image2.Height, image2.Height, 0, 20116800);
-						image.Width = WordOpenXmlUtils.PixelsToEmus(image2.Width, image2.Width, 0, 20116800);
+						image.Height = WordOpenXmlUtils.PixelsToEmus(image2.Height, DEFAULT_DPI, 0, 20116800);
+						image.Width = WordOpenXmlUtils.PixelsToEmus(image2.Width, DEFAULT_DPI, 0, 20116800);
 						extension = codec.EncodedFormat switch
 						{
 							SKEncodedImageFormat.Jpeg => "jpg", 
