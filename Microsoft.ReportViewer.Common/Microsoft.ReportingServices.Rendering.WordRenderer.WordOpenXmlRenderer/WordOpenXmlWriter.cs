@@ -8,6 +8,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using SkiaSharp;
 
 namespace Microsoft.ReportingServices.Rendering.WordRenderer.WordOpenXmlRenderer
 {
@@ -338,11 +339,19 @@ namespace Microsoft.ReportingServices.Rendering.WordRenderer.WordOpenXmlRenderer
 			{
 				try
 				{
-					using (Image image2 = Image.FromStream(new MemoryStream(imgBuf)))
+					using (var image2 = SKImage.FromEncodedData(new MemoryStream(imgBuf)))
+					using (var codec = SKCodec.Create(image2.EncodedData))
 					{
-						image.Height = WordOpenXmlUtils.PixelsToEmus(image2.Height, image2.VerticalResolution, 0, 20116800);
-						image.Width = WordOpenXmlUtils.PixelsToEmus(image2.Width, image2.HorizontalResolution, 0, 20116800);
-						extension = ((image2.RawFormat.Guid == ImageFormat.Png.Guid) ? "png" : ((image2.RawFormat.Guid == ImageFormat.Jpeg.Guid) ? "jpg" : ((!(image2.RawFormat.Guid == ImageFormat.Gif.Guid)) ? "bmp" : "gif")));
+						image.Height = WordOpenXmlUtils.PixelsToEmus(image2.Height, image2.Height, 0, 20116800);
+						image.Width = WordOpenXmlUtils.PixelsToEmus(image2.Width, image2.Width, 0, 20116800);
+						extension = codec.EncodedFormat switch
+						{
+							SKEncodedImageFormat.Jpeg => "jpg", 
+							SKEncodedImageFormat.Png => "png", 
+							SKEncodedImageFormat.Gif => "gif", 
+							SKEncodedImageFormat.Bmp => "bmp", 
+							_ => "png",
+						};
 					}
 				}
 				catch (ArgumentException)

@@ -1,9 +1,11 @@
+using System;
 using Microsoft.ReportingServices.OnDemandReportRendering;
 using Microsoft.ReportingServices.Rendering.ExcelRenderer.Excel;
 using Microsoft.ReportingServices.Rendering.RPLProcessing;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using SkiaSharp;
 
 namespace Microsoft.ReportingServices.Rendering.ExcelRenderer.Layout
 {
@@ -276,13 +278,32 @@ namespace Microsoft.ReportingServices.Rendering.ExcelRenderer.Layout
 			if (m_imageData != null && m_imageData.Length != 0L)
 			{
 				m_imageData.Position = 0L;
-				System.Drawing.Image image = System.Drawing.Image.FromStream(m_imageData);
-				m_imageFormat = image.RawFormat;
+				var image = SKImage.FromEncodedData(m_imageData);
+				var codec = SKCodec.Create(image.EncodedData);
+				m_imageFormat = GetImageFormat(codec);
 				Width = image.Width;
 				Height = image.Height;
-				HorizontalResolution = image.HorizontalResolution;
-				VerticalResolution = image.VerticalResolution;
+				HorizontalResolution = image.Width;
+				VerticalResolution = image.Height;
+				codec.Dispose();
 				image.Dispose();
+			}
+		}
+
+		private static ImageFormat GetImageFormat(SKCodec codec)
+		{
+			switch (codec.EncodedFormat)
+			{
+				case SKEncodedImageFormat.Gif:
+					return ImageFormat.Gif;
+				case SKEncodedImageFormat.Jpeg:
+					return ImageFormat.Jpeg;
+				case SKEncodedImageFormat.Png:
+					return ImageFormat.Png;
+				case SKEncodedImageFormat.Bmp:
+					return ImageFormat.Bmp;
+				default:
+					throw new ReportRenderingException(ExcelRenderRes.UnknownImageFormat(codec.EncodedFormat.ToString()));
 			}
 		}
 	}
